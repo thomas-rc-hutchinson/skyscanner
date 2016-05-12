@@ -14,7 +14,7 @@ defmodule Skyscanner.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :httpoison, :poison]]
   end
 
   # Dependencies can be Hex packages:
@@ -27,6 +27,9 @@ defmodule Skyscanner.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:httpoison, "~> 0.8.0"},
+      {:poison, "~> 2.1"}
+    ]
   end
 end
