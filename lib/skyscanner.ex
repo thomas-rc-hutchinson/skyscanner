@@ -51,10 +51,10 @@ defmodule SkyScanner do
       %SearchResult{from: from, to: to,
 		    depart: [depart: depart,
 			     depart_arrival: depart_arival,
-			     depart_carriers: depart_carrier],
+			     depart_carrier: depart_carrier],
 		    return: [return: return,
 			     return_arrival: return_arival,
-			     return_carriers: return_carrier],
+			     return_carrier: return_carrier],
 		    price: price}
       end)
   end
@@ -62,9 +62,7 @@ defmodule SkyScanner do
   def lookup(:return_carrier, itinery, results) do
     inboundlegid = itinery["InboundLegId"]
     legs = results["Legs"]
-    [flight] = Enum.find(legs, fn(leg) ->
-      id = leg["Id"]
-      id == inboundlegid end)["FlightNumbers"]
+    [flight] = from_leg(results, "Id", inboundlegid)["FlightNumbers"]
     
     carrierid = flight["CarrierId"]
     Enum.find(results["Carriers"], fn(carrier) ->
@@ -72,11 +70,8 @@ defmodule SkyScanner do
   end
   
   def lookup(:depart_carrier, itinery, results) do
-    inboundlegid = itinery["OutboundLegId"]
-    legs = results["Legs"]
-    [flight] = Enum.find(legs, fn(leg) ->
-      id = leg["Id"]
-      id == inboundlegid end)["FlightNumbers"]
+    outboundlegid = itinery["OutboundLegId"]
+    [flight] = from_leg(results, "Id", outboundlegid)["FlightNumbers"]
     
     carrierid = flight["CarrierId"]
     Enum.find(results["Carriers"], fn(carrier) ->
@@ -86,18 +81,12 @@ defmodule SkyScanner do
 	
   def lookup(:return_arrival, itinery, results) do
     inboundlegid = itinery["InboundLegId"]
-    legs = results["Legs"]
-    originstationid = Enum.find(legs, fn(leg) ->
-      id = leg["Id"]
-      id == inboundlegid end)["Arrival"]
+    from_leg(results, "Id", inboundlegid)["Arrival"]
   end
   
   def lookup(:depart_arrival, itinery, results) do
     outboundlegid = itinery["OutboundLegId"]
-    legs = results["Legs"]
-    originstationid = Enum.find(legs, fn(leg) ->
-      id = leg["Id"]
-      id == outboundlegid end)["Arrival"]
+    from_leg(results, "Id", outboundlegid)["Arrival"]
   end
   
   def lookup(:price, itinery, results) do
@@ -110,26 +99,17 @@ defmodule SkyScanner do
   
   def lookup(:return, itinery, results) do
     inboundlegid = itinery["InboundLegId"]
-    legs = results["Legs"]
-    originstationid = Enum.find(legs, fn(leg) ->
-      id = leg["Id"]
-      id == inboundlegid end)["Departure"]
+    from_leg(results, "Id", inboundlegid)["Departure"]
   end
   
   def lookup(:depart, itinery, results) do
     outboundlegid = itinery["OutboundLegId"]
-    legs = results["Legs"]
-    originstationid = Enum.find(legs, fn(leg) ->
-      id = leg["Id"]
-      id == outboundlegid end)["Departure"]
+    from_leg(results, "Id", outboundlegid)["Departure"]
   end
   
   def lookup(:from, itinery, results) do
     outboundlegid = itinery["OutboundLegId"]
-    legs = results["Legs"]
-    originstationid = Enum.find(legs, fn(leg) ->
-      id = leg["Id"]
-      id == outboundlegid end)["OriginStation"]
+    originstationid = from_leg(results, "Id", outboundlegid)["OriginStation"]
     
     places = results["Places"]
     Enum.find(places, fn(place) ->
@@ -139,14 +119,17 @@ defmodule SkyScanner do
 
   def lookup(:to, itinery, results) do
     inboundlegid = itinery["InboundLegId"]
-    legs = results["Legs"]
-    originstationid = Enum.find(legs, fn(leg) ->
-      id = leg["Id"]
-      id == inboundlegid end)["OriginStation"]
+    originstationid = from_leg(results, "Id", inboundlegid)["OriginStation"]
     
     places = results["Places"]
     Enum.find(places, fn(place) ->
       id = place["Id"]
       id == originstationid end)["Name"]
   end
+
+  def from_leg(results, key, value) do
+    Enum.find(results["Legs"], fn(leg) ->
+      leg[key] == value end)
+  end
+  
 end
