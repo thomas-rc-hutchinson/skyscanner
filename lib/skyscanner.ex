@@ -9,8 +9,8 @@ defmodule SkyScanner do
 	     locale: "en-GG",
 	     originplace: criteria[:from],
 	     destinationplace: criteria[:to],
-	     outbounddate: criteria[:fromdate],
-	     inbounddate: criteria[:todate],
+	     outbounddate: criteria[:depart],
+	     inbounddate: criteria[:return],
 	     adults: "1",
 	     apiKey: apiKey]}
 
