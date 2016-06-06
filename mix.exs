@@ -2,7 +2,8 @@ defmodule Skyscanner.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :skyscanner,
+    [app: :take_me_home,
+     description: "find your way home",
      version: "0.0.1",
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
@@ -14,7 +15,9 @@ defmodule Skyscanner.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :httpoison, :poison]]
+    [applications:
+     [:logger, :httpoison, :poison, :calendar],
+    mod: {TakeMeHome, []}]
   end
 
   # Dependencies can be Hex packages:
@@ -29,7 +32,9 @@ defmodule Skyscanner.Mixfile do
   defp deps do
     [
       {:httpoison, "~> 0.8.0"},
-      {:poison, "~> 2.1"}
+      {:poison, "~> 2.1"},
+      {:calendar, "~> 0.14.0"},
+      {:gen_smtp, "~> 0.10.0"}
     ]
   end
 end

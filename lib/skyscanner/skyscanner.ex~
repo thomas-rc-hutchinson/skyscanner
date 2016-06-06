@@ -1,7 +1,11 @@
 defmodule SkyScanner do
+  require Logger
   
+  @api_key Application.get_env(:skyscanner, :api_key)
+
   def search(criteria) do
-    apiKey = System.get_env("SKYSCANNER_API_KEY")
+    Logger.debug("in SkyScanner.search")
+    apiKey = @api_key
     url = "http://partners.api.skyscanner.net/apiservices/pricing/v1.0"
     form = {:form,
 	    [country: criteria[:country],
@@ -27,7 +31,7 @@ defmodule SkyScanner do
       "Accept" => "application/json"
     }
 
-    IO.puts "session url=#{pricing_url}"
+    Logger.debug("session url=#{pricing_url}")
     :timer.sleep 5000 #wait required before checking
     
     {:ok, resp2} = HTTPoison.get(pricing_url, headers)
@@ -94,7 +98,6 @@ defmodule SkyScanner do
     price = Enum.map(pricings, fn(price) ->
       price["Price"]
     end) |> Enum.min
-    "#{price} GBP"
   end
   
   def lookup(:return, itinery, results) do
