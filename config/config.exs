@@ -29,6 +29,6 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 
-config :take_me_home, api_key: ""
+import_config "private_config.exs"
 
 config :logger, level: :debug
