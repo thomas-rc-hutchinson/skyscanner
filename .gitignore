@@ -4,3 +4,4 @@
 erl_crash.dump
 *.ez
 config/private_config.exs*
+lib/takemehome/*~
