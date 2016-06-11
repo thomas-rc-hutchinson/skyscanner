@@ -32,3 +32,4 @@ use Mix.Config
 import_config "private_config.exs"
 
 config :logger, level: :debug
+config :take_me_home, interval: 1000*60

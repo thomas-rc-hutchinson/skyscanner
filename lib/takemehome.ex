@@ -8,12 +8,18 @@ defmodule TakeMeHome do
 
     children = [
       worker(EmailDispatcher, []),
-      worker(Scheduler, [{"MAN-Sky","STOC-Sky",1000*60}])
+      worker(Scheduler,
+	[{"MAN-Sky","STOC-Sky",config(:interval)}])
     ]
 
     opts = [strategy: :one_for_one, name: TakeMeHome.Supervisor]
     Supervisor.start_link(children, opts)
   end
+
+  def config(key) do
+    Application.get_env(:take_me_home, key)
+  end
+  
 
       
 end

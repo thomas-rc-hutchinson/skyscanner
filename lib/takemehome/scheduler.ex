@@ -2,11 +2,16 @@ defmodule Scheduler do
   use GenServer
   require Logger
 
-  def test, do: start_link({"MAN-Sky","STOC-Sky",1000})
+  def test, do: start_link({"MAN-Sky","STOC-Sky",100000})
   
   def start_link(state) do
-    GenServer.start_link(__MODULE__,  state)
+    GenServer.start_link(__MODULE__,  state, name: __MODULE__)
   end
+
+  def process_info do
+    Process.info(Process.whereis(__MODULE__))
+  end
+  
 
   def init({to, from, interval} = state) do
     {:ok, state, interval}
