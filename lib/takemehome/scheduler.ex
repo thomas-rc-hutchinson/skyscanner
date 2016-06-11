@@ -30,7 +30,7 @@ defmodule Scheduler do
     Logger.debug("Found #{inspect(response)}")
     #flights less than 150 GBP
     flights = response |> Enum.filter(fn(it) -> it.price <= 150 end)
-    EmailServer.send_email(inspect(response))
+    EmailDispatcher.send_email(inspect(response))
     {:noreply, state, interval}
   end  
 end
