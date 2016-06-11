@@ -32,7 +32,7 @@ defmodule SkyScanner do
     }
 
     Logger.debug("session url=#{pricing_url}")
-    :timer.sleep 5000 #wait required before checking
+    :timer.sleep 20000 #wait required before checking
     
     {:ok, resp2} = HTTPoison.get(pricing_url, headers)
     parse_response(resp2.body)

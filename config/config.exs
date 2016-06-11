@@ -32,4 +32,18 @@ use Mix.Config
 import_config "private_config.exs"
 
 config :logger, level: :debug
+config :logger,
+  backends: [{LoggerFileBackend, :info},
+	     {LoggerFileBackend, :error},
+	     {LoggerFileBackend, :debug}]
+
+config :logger, :debug,
+  path: "take_me_home.log",
+  level: :debug
+
+config :logger, :info,
+  path: "take_me_home.log",
+  level: :info
+
+
 config :take_me_home, interval: 1000*60
