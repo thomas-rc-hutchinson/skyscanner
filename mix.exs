@@ -16,7 +16,7 @@ defmodule Skyscanner.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [applications:
-     [:logger, :httpoison, :poison, :calendar],
+     [:logger, :httpoison, :poison, :calendar, :gen_smtp],
     mod: {TakeMeHome, []}]
   end
 
@@ -34,7 +34,8 @@ defmodule Skyscanner.Mixfile do
       {:httpoison, "~> 0.8.0"},
       {:poison, "~> 2.1"},
       {:calendar, "~> 0.14.0"},
-      {:gen_smtp, "~> 0.10.0"}
+      {:gen_smtp, "~> 0.10.0"},
+      {:exrm, "~> 1.0"}
     ]
   end
 end
