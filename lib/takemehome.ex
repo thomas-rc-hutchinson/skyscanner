@@ -8,10 +8,12 @@ defmodule TakeMeHome do
 
     children = [
       worker(EmailDispatcher, []),
+      worker(Scheduler, [{"MAN-Sky","STOC-Sky",1000*60}]
     ]
 
     opts = [strategy: :one_for_one, name: TakeMeHome.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
+      
 end
