@@ -1,4 +1,4 @@
-defmodule TakeMeHome do
+defmodule TakeMeHome.Application do
   use Application
   require Logger
   
@@ -7,19 +7,14 @@ defmodule TakeMeHome do
     Logger.debug("Starting Take Me Home")
 
     children = [
-      worker(EmailDispatcher, []),
-      worker(Scheduler,
-	[{"MAN-Sky","STOC-Sky",config(:interval)}])
+      worker(TakeMeHome.EmailDispatcher, []),
+      worker(TakeMeHome.Scheduler,
+	[{"MAN-Sky","STOC-Sky", interval}])
     ]
 
     opts = [strategy: :one_for_one, name: TakeMeHome.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
-  def config(key) do
-    Application.get_env(:take_me_home, key)
-  end
-  
-
-      
+  def interval, do: Application.get_env(:take_me_home, :interval)
 end

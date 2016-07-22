@@ -1,4 +1,4 @@
-defmodule SkyScanner do
+defmodule TakeMeHome.SkyScanner do
   require Logger
   
   @api_key Application.get_env(:take_me_home, :api_key)
@@ -52,7 +52,7 @@ defmodule SkyScanner do
       depart_carrier = lookup(:depart_carrier, it, data)
       return_carrier = lookup(:return_carrier, it, data)
       
-      %SearchResult{from: from, to: to,
+      %TakeMeHome.SearchResult{from: from, to: to,
 		    depart: [depart: depart,
 			     depart_arrival: depart_arival,
 			     depart_carrier: depart_carrier],

@@ -1,17 +1,10 @@
-defmodule Scheduler do
+defmodule TakeMeHome.Scheduler do
   use GenServer
   require Logger
 
-  def test, do: start_link({"MAN-Sky","STOC-Sky",100000})
-  
   def start_link(state) do
     GenServer.start_link(__MODULE__,  state, name: __MODULE__)
   end
-
-  def process_info do
-    Process.info(Process.whereis(__MODULE__))
-  end
-  
 
   def init({to, from, interval} = state) do
     {:ok, state, interval}
@@ -19,19 +12,42 @@ defmodule Scheduler do
 
   def handle_info(:timeout, {to, from, interval} = state) do
     Logger.debug("Checking flights...")
+    
+    flights = lookup_flights({to, from,
+			      TakeMeHome.Date.upcoming(:friday),
+			      TakeMeHome.Date.upcoming(:sunday)},[],10)
+    
+    Logger.debug("Found #{inspect(flights)}")
+    EmailDispatcher.send_email(flights_to_html(flights))
+    {:noreply, state, interval}
+  end
 
+  def lookup_flights(_, results, 0) do
+    results
+  end
+  
+  def lookup_flight({to, from, depart, return}, results, limit) do
     response = SkyScanner.search(
       country: "UK",
       from: from,
       to: to,
-      depart: "2016-06-24",
-      return: "2016-06-26")
+      depart: Calendar.Date.to_s(depart),
+      return: Calendar.Date.to_s(return))
 
-    Logger.debug("Found #{inspect(response)}")
-    #flights less than 150 GBP
-    flights = response |> Enum.filter(fn(it) -> it.price <= 150 end)
-    EmailDispatcher.send_email(inspect(response))
-    {:noreply, state, interval}
-  end  
+    lookup_flights({to,from,
+		    TakeMeHome.Date.next(depart, :saturday),
+		    TakeMeHome.Date.next(return, :sunday)},
+                    [response|results], limit-1)
+  end
+
+  def flights_to_html(flights) do
+    Enum.reduce(flights, "", fn(f, acc) ->
+      """
+      Price: #{f.price}</br>
+      Depart: #{f.depart}</br> 
+      Return: #{f.return}</br></br>
+      """ <> acc end)
+  end
+  
 end
 
