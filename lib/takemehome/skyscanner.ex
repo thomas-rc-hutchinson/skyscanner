@@ -24,6 +24,7 @@ defmodule TakeMeHome.SkyScanner do
     }
 
     {:ok, resp} = HTTPoison.post(url,form,headers)
+		Logger.info("#{inspect(resp)}")
     pricing_url = :proplists.get_value("Location", resp.headers)
     pricing_url = pricing_url <> "?apiKey=#{apiKey}&stops=0"
 

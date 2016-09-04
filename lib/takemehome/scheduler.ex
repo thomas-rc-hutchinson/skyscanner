@@ -10,15 +10,23 @@ defmodule TakeMeHome.Scheduler do
     {:ok, state, interval}
   end
 
+	def trigger do
+		send(Process.whereis(TakeMeHome.Scheduler), :timeout)
+	end
+
   def handle_info(:timeout, {to, from, interval} = state) do
-    Logger.debug("Checking flights...")
-    
+    Logger.debug("Checking flights from #{from} to #{to}")
+
+
+		#TODO Clean up. Very messy
+		friday = TakeMeHome.Date.upcoming(:friday)
+		sunday = TakeMeHome.Date.next(friday, :sunday)
+
     flights = lookup_flights({to, from,
-			      TakeMeHome.Date.upcoming(:friday),
-			      TakeMeHome.Date.upcoming(:sunday)},[],10)
+															friday, sunday},[],10)
     
     Logger.debug("Found #{inspect(flights)}")
-    EmailDispatcher.send_email(flights_to_html(flights))
+    TakeMeHome.EmailClient.send_email(flights_to_html(flights))
     {:noreply, state, interval}
   end
 
@@ -26,8 +34,8 @@ defmodule TakeMeHome.Scheduler do
     results
   end
   
-  def lookup_flight({to, from, depart, return}, results, limit) do
-    response = SkyScanner.search(
+  def lookup_flights({to, from, depart, return}, results, limit) do
+    response = TakeMeHome.SkyScanner.search(
       country: "UK",
       from: from,
       to: to,
@@ -35,17 +43,27 @@ defmodule TakeMeHome.Scheduler do
       return: Calendar.Date.to_s(return))
 
     lookup_flights({to,from,
-		    TakeMeHome.Date.next(depart, :saturday),
+		    TakeMeHome.Date.next(depart, :friday),
 		    TakeMeHome.Date.next(return, :sunday)},
-                    [response|results], limit-1)
+                    response ++ results, limit-1)
   end
 
-  def flights_to_html(flights) do
+  defp flights_to_html(flights) do
     Enum.reduce(flights, "", fn(f, acc) ->
       """
-      Price: #{f.price}</br>
-      Depart: #{f.depart}</br> 
-      Return: #{f.return}</br></br>
+      Price: #{inspect(f.price)}
+      Depart: #{inspect(f.depart)} with #{inspect(f.depart[:depart_carrier])}
+      Return: #{inspect(f.return)} with #{inspect(f.return[:return_carrier])}
+
+      """ <> acc end)
+  end
+
+	defp flights_to_string(flights) do
+    Enum.reduce(flights, "", fn(f, acc) ->
+      """
+      Price: #{f.price}\n
+      Depart: #{f.depart}\n 
+      Return: #{f.return}\n
       """ <> acc end)
   end
   
